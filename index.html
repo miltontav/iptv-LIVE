@@ -1,186 +1,378 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="es">
 
 <head>
     <meta charset="utf-8">
-    <title>LA KALLE MALLORCA WEB TV：Online SmartTV</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="author" content="Zhang Boheng">
-    <meta name="keywords" content="iptv, movie, github, online tv, web tv, series tv...">
-    <link rel="stylesheet" href="css/style.css" />
-    <script src="js/jquery-3.6.0.min.js"></script>
-    <script src="js/index.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Radio Browser - La Kalle Mallorca</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+         :root {
+            --primary-color: #ff4d4d;
+            --secondary-color: #4CAF50;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8f9fa;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .filters {
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        select {
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        
+        .radio-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 100px;
+            /* Espacio para el reproductor fijo */
+        }
+        
+        .radio-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        
+        .radio-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .station-logo {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn {
+            background: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        
+        .btn:hover {
+            background: #45a049;
+        }
+        
+        .country-section {
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 8px;
+            background: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        
+        .latin-america {
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .north-america {
+            border-left: 4px solid var(--secondary-color);
+        }
+        
+        .player-fixed {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+        
+        .now-playing {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-right: 1rem;
+            display: inline-block;
+        }
+        
+        .audio-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+        
+        #audioPlayer {
+            width: 100%;
+            max-width: 500px;
+        }
+        
+        @media (max-width: 768px) {
+            .filters {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            select {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            .player-fixed {
+                padding: 0.5rem;
+            }
+            .now-playing {
+                font-size: 0.8rem;
+                margin-bottom: 0.5rem;
+                display: block;
+            }
+        }
+    </style>
 </head>
-<style>
-    body {
-        background-image: url("images/bg.jpg");
-        overflow-x: hidden;
-    }
-    
-    #languages,
-    #source {
-        width: 50%;
-        cursor: pointer;
-    }
-</style>
 
 <body>
-    <div id="mySidenav" class="sidenav">
-        <h3>LA KALLE MALLORCA WEB TV</h3>
-        <hr>
-        <div>
-            <span>Sensitive Content</span>
-            <label class="switch">
-            <input type="checkbox" id="adultban">
-            <span class="slider round"></span>
-            </label>
-        </div>
-        <div>
-            <span>Languages</span>
-            <select id="languages" name="languages">
-            </select>
-        </div>
-        <div>
-            <span>Clear</span>
-            <button class="cachebtn">All</button>
-        </div>
-        <div>
-            <span>Source</span>
-            <button class="cachebtn"><a href="#sourcebox" data-reveal-id="sourceitem">Control</a></button>
-        </div>
-        <div>
-            <span>Version</span>
-            <label class="switch" style="cursor: pointer;"><a href="#logbox" data-reveal-id="logboxitem" style="color:#fff">8.2.0</a></label>
-        </div>
-        <div>
-            <span>About</span>
-            <label class="switch" style="cursor: pointer;"><a href="#infobox" data-reveal-id="infoboxitem" style="color:#fff">APP</a></label>
-        </div>
-    </div>
-    <div id="main">
-        <span style="cursor:pointer"><img src="images/menuicon.png"></span>
-    </div>
-    <div id="popupbox">
-        <div id="chooseitem" class="reveal-modal">
-            <a href="#" class="close-reveal-modal">×</a>
-            <h2>Select</h2>
-            <div id="selectform">
-                <input type="radio" name="radioName" value="1" checked/> <span>Contries</span> <br />
-                <input type="radio" name="radioName" value="2" /> <span>Languages</span> <br />
-                <input type="radio" name="radioName" value="3" /> <span>Category</span> <br />
-            </div>
-            <button class="stylebtn">GO!</button>
-        </div>
-    </div>
-    <div id="sourcebox">
-        <div id="sourceitem" class="source-modal">
-            <a href="#" class="close-source-modal">×</a>
-            <h2>Select</h2>
-            <div id="selectform">
-                <input type="radio" name="sourceName" value="1" checked/> <span>Moive</span> <br />
-                <input type="radio" name="sourceName" value="2" /> <span>Novel</span> <br />
-                <input type="radio" name="sourceName" value="3" /> <span>Manga</span> <br />
-                <input type="radio" name="sourceName" value="4" /> <span>Music</span> <br />
-                <input type="radio" name="sourceName" value="5" /> <span>Porn</span> <br />
-            </div>
-            <button class="stylebtn" onclick="goToSource()"><img src="./images/nextselect.svg" style="width:30px;"></button>
-        </div>
-    </div>
-    <div id="logbox">
-        <div id="logboxitem" class="log-modal">
-            <a href="#" class="close-log-modal">×</a>
-            <div class="scrollidbar" style="text-align: left;">
-            </div>
-        </div>
-    </div>
-    <div id="infobox">
-        <div id="infoboxitem" class="log-modal">
-            <a href="#" class="close-log-modal">×</a>
-            <div class="scrollappbar" style="text-align: left;">
-                <p>App Will Publish 2022 or later.</p>
-                <p>Developer: Zhang Boheng</p>
-                <div class="circlescon" style="display:flex;">
-                    <li>
-                        <a target="_blank" href="https://github.com/zhangboheng/"><img src="images/github.svg"></a>
-                    </li>
-                    <li>
-                        <a target="_blank" href="https://www.youtube.com/c/LuckyDesigner"><img src="images/youtube.svg"></a>
-                    </li>
-                    <li>
-                        <a target="_blank" href="https://t.me/Luckydesignerspace"><img src="images/telegram.svg"></a>
-                    </li>
-                    <li>
-                        <img src="images/wechat.svg">
-                        <div class="qrcode">
-                            <img src="images/wechatpub.jpg" style="width:100%; height:auto" />
-                        </div>
-                    </li>
-                </div>
-                <p>Copyright 2019-2021 行运设计师 www.luckydesigner.space All Rights Reserved.</p>
-            </div>
-        </div>
-    </div>
-    <div class="bodyCon08">
-        <div class="students">
-            <div id="four_flash">
-                <div class="flashBg">
-                    <ul class="mobile">
-                        <li>
-                            <img src="images/tv.svg" />
-                            <dd>
-                                <a href="#popupbox" data-reveal-id="chooseitem"><button class="stylebtn">Enter</button></a>
-                            </dd>
-                            <p>Watch 6000+ TV Channels...</p>
-                        </li>
+    <div class="container">
+        <header>
+            <h1>Radio Browser - La Kalle Mallorca</h1>
+            <div class="filters">
+                <select id="countryFilter" class="form-select">
+                    <option value="">Todos los países</option>
+                    <optgroup label="Latinoamérica">
+                        <option value="AR">Argentina</option>
+                        <option value="CO">Colombia</option>
+                        <option value="CU">Cuba</option>
+                        <option value="EC">Ecuador</option>
+                        <option value="SV">El Salvador</option>
+                        <option value="PA">Panamá</option>
+                        <option value="PE">Perú</option>
+                        <option value="PR">Puerto Rico</option>
+                        <option value="DO">República Dominicana</option>
+                    </optgroup>
+                    <optgroup label="América del Norte">
+                        <option value="US">Estados Unidos</option>
+                    </optgroup>
+                    <optgroup label="Europa">
+                        <option value="ES">España</option>
+                    </optgroup>
+                </select>
 
-                        <li>
-                            <img src="images/comprehensive.svg" />
-                            <dd>
-                                <a href="routes/comprehensive.html"><button class="stylebtn">Enter</button></a>
-                            </dd>
-                            <p>Watch Movies, Series, Animes...</p>
-                        </li>
-                        <li>
-                            <img src="images/radio.svg" />
-                            <dd>
-                                <a href="#popupbox" data-reveal-id="chooseitem"><button class="stylebtn">Enter</button></a>
-                            </dd>
-                            <p>Listen 28000+ Radio Stations...</p>
-                        </li>
-                        <li>
-                            <img src="images/reading.svg" />
-                            <dd>
-                                <a href="routes/novel.html"><button class="stylebtn">Enter</button></a>
-                            </dd>
-                            <p>Reading More Than 100000+ Books...</p>
-                        </li>
-                        <li>
-                            <img src="images/manga.svg" />
-                            <dd>
-                                <a href="routes/manga.html"><button class="stylebtn">Enter</button></a>
-                            </dd>
-                            <p>Reading Lots of Manga Books...</p>
-                        </li>
-                        <li>
-                            <img src="images/music.svg" />
-                            <dd>
-                                <a href="routes/music.html"><button class="stylebtn">Enter</button></a>
-                            </dd>
-                            <p>Listen to The World Music...</p>
-                        </li>
-                        <li>
-                            <img src="images/game.svg" />
-                            <dd>
-                                <a href="routes/game.html"><button class="stylebtn">Enter</button></a>
-                            </dd>
-                            <p>Constructing until version 9.0.0</p>
-                        </li>
-                    </ul>
+                <select id="genreFilter" class="form-select">
+                    <option value="">Todos los géneros</option>
+                    <option value="latin">Latino</option>
+                    <option value="salsa">Salsa</option>
+                    <option value="merengue">Merengue</option>
+                    <option value="reggaeton">Reggaeton</option>
+                    <option value="bachata">Bachata</option>
+                    <option value="pop">Pop</option>
+                    <option value="rock">Rock</option>
+                    <option value="tropical">Tropical</option>
+                </select>
+            </div>
+        </header>
+
+        <main id="radioGrid" class="radio-grid"></main>
+
+        <div class="player-fixed">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-md-4">
+                        <span id="nowPlaying" class="now-playing">
+                            No hay emisora reproduciendo
+                        </span>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="audio-controls">
+                            <audio id="audioPlayer" controls>
+                                Tu navegador no soporta el elemento audio.
+                            </audio>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    <script src="js/translator.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const API_BASE_URL = 'https://de1.api.radio-browser.info/json';
+        const COUNTRIES = {
+            'ES': { name: 'España', flag: '🇪🇸' },
+            'AR': { name: 'Argentina', flag: '🇦🇷' },
+            'CO': { name: 'Colombia', flag: '🇨🇴' },
+            'MX': { name: 'México', flag: '🇲🇽' },
+            'PE': { name: 'Perú', flag: '🇵🇪' },
+            'DO': { name: 'República Dominicana', flag: '🇩🇴' },
+            'CU': { name: 'Cuba', flag: '🇨🇺' },
+            'PR': { name: 'Puerto Rico', flag: '🇵🇷' }
+        };
+
+        let currentStation = null;
+
+        async function loadStations() {
+            try {
+                const countryFilter = document.getElementById('countryFilter');
+                Object.entries(COUNTRIES).forEach(([code, data]) => {
+                    const option = document.createElement('option');
+                    option.value = code;
+                    option.textContent = `${data.flag} ${data.name}`;
+                    countryFilter.appendChild(option);
+                });
+
+                const promises = Object.keys(COUNTRIES).map(country =>
+                    fetch(`${API_BASE_URL}/stations/bycountrycodeexact/${country}`)
+                        .then(response => response.json())
+                );
+
+                const results = await Promise.all(promises);
+                const stations = results.flat()
+                    .filter(station => station.url_resolved && station.name);
+
+                displayFeaturedStations(stations);
+                displayStationsByCountry(stations);
+
+                return stations;
+            } catch (error) {
+                console.error('Error cargando emisoras:', error);
+                showError('Error al cargar las emisoras');
+            }
+        }
+
+        function displayFeaturedStations(stations) {
+            const featured = stations
+                .sort((a, b) => (b.clickcount || 0) - (a.clickcount || 0))
+                .slice(0, 6);
+
+            const container = document.getElementById('featuredStations');
+            container.innerHTML = featured.map(station => `
+                <div class="col-md-4 mb-4">
+                    <div class="station-card text-center p-3">
+                        <img src="${station.favicon || getDefaultImage()}" 
+                             alt="${station.name}" 
+                             class="station-logo"
+                             onerror="this.src='${getDefaultImage()}'">
+                        <h5 class="mt-3">${station.name}</h5>
+                        <p class="text-muted">${COUNTRIES[station.countrycode]?.name || station.country}</p>
+                        <button class="btn btn-primary" onclick="playStation('${station.url_resolved}', '${station.name}')">
+                            <i class="fas fa-play"></i> Reproducir
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function displayStationsByCountry(stations) {
+            const container = document.getElementById('stationsContainer');
+            const groupedStations = {};
+
+            stations.forEach(station => {
+                if (!groupedStations[station.countrycode]) {
+                    groupedStations[station.countrycode] = [];
+                }
+                groupedStations[station.countrycode].push(station);
+            });
+
+            container.innerHTML = Object.entries(groupedStations)
+                .map(([country, countryStations]) => `
+                    <div class="country-section mb-4">
+                        <h3 class="mb-4">
+                            ${COUNTRIES[country]?.flag || ''} ${COUNTRIES[country]?.name || country}
+                        </h3>
+                        <div class="row">
+                            ${countryStations.map(station => `
+                                <div class="col-md-6 mb-4">
+                                    <div class="station-card p-3">
+                                        <div class="d-flex align-items-center">
+                                            <img src="${station.favicon || getDefaultImage()}" 
+                                                 alt="${station.name}"
+                                                 class="station-logo"
+                                                 style="width: 80px; height: 80px;"
+                                                 onerror="this.src='${getDefaultImage()}'">
+                                            <div class="ms-3">
+                                                <h5>${station.name}</h5>
+                                                <p class="text-muted mb-2">${station.tags || 'Sin género'}</p>
+                                                <button class="btn btn-sm btn-primary" 
+                                                        onclick="playStation('${station.url_resolved}', '${station.name}')">
+                                                    <i class="fas fa-play"></i> Reproducir
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `).join('');
+        }
+
+        function playStation(url, name) {
+            const player = document.getElementById('audioPlayer');
+            const nowPlaying = document.getElementById('nowPlaying');
+
+            if (currentStation) {
+                player.pause();
+            }
+
+            player.src = url;
+            player.play()
+                .then(() => {
+                    currentStation = { url, name };
+                    nowPlaying.innerHTML = `
+                        <i class="fas fa-broadcast-tower"></i> 
+                        Reproduciendo: ${name}
+                    `;
+                })
+                .catch(error => {
+                    console.error('Error reproduciendo:', error);
+                    nowPlaying.innerHTML = `
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Error al reproducir la emisora
+                    `;
+                });
+        }
+
+        function getDefaultImage() {
+            return 'https://cdn-icons-png.flaticon.com/512/2404/2404779.png';
+        }
+
+        function showError(message) {
+            const container = document.getElementById('stationsContainer');
+            container.innerHTML = `
+                <div class="alert alert-danger" role="alert">
+                    <i class="fas fa-exclamation-circle"></i> ${message}
+                </div>
+            `;
+        }
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', loadStations);
+    </script>
 </body>
 
 </html>
